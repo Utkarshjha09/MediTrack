@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend API Tester - Medicine Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .status.online { background: #10b981; color: white; }
+        .status.offline { background: #ef4444; color: white; }
+        
+        .workflow {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .workflow h3 { color: #1e40af; margin-bottom: 10px; }
+        .workflow ol { margin-left: 20px; }
+        .workflow li { margin: 8px 0; color: #374151; }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .section h2 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            background: #1f2937;
+            color: #10b981;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .response.error {
+            color: #ef4444;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .data-list {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .data-item {
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+        }
+        .data-item:last-child {
+            border-bottom: none;
+        }
+        .data-item strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Medicine Tracker - Backend API Tester</h1>
+        <div id="statusBadge" class="status offline">⚫ Checking backend...</div>
+        
+        <div class="workflow">
+            <h3>📋 Workflow (Do in this order):</h3>
+            <ol>
+                <li><strong>Step 1:</strong> Create a Storage Slot (where medicine will be stored)</li>
+                <li><strong>Step 2:</strong> Create a Medicine (product information)</li>
+                <li><strong>Step 3:</strong> Create a Batch (specific stock with expiry date)</li>
+                <li><strong>Step 4:</strong> View all data to verify</li>
+            </ol>
+        </div>
+
+        <!-- STEP 1: Slots -->
+        <div class="section">
+            <h2>Step 1️⃣: Storage Slots</h2>
+            <div class="grid">
+                <div>
+                    <h3>Create New Slot</h3>
+                    <div class="form-group">
+                        <label>Slot Number:</label>
+                        <input type="text" id="slotNumber" placeholder="e.g., A-101" value="A-101">
+                    </div>
+                    <div class="form-group">
+                        <label>Location:</label>
+                        <input type="text" id="slotLocation" placeholder="e.g., Main Warehouse" value="Main Warehouse">
+                    </div>
+                    <div class="form-group">
+                        <label>Capacity:</label>
+                        <input type="number" id="slotCapacity" value="500">
+                    </div>
+                    <button class="btn btn-primary" onclick="createSlot()">➕ Create Slot</button>
+                </div>
+                <div>
+                    <h3>View All Slots</h3>
+                    <button class="btn btn-secondary" onclick="getAllSlots()">📋 Get All Slots</button>
+                    <div id="slotsList" class="data-list" style="display:none;"></div>
+                </div>
+            </div>
+            <div id="slotResponse" class="response" style="display:none;"></div>
+        </div>
+
+        <!-- STEP 2: Medicines -->
+        <div class="section">
+            <h2>Step 2️⃣: Medicines</h2>
+            <div class="grid">
+                <div>
+                    <h3>Create New Medicine</h3>
+                    <div class="form-group">
+                        <label>Medicine Name:</label>
+                        <input type="text" id="medicineName" placeholder="e.g., Paracetamol 500mg" value="Paracetamol 500mg">
+                    </div>
+                    <div class="form-group">
+                        <label>Type:</label>
+                        <select id="medicineType">
+                            <option>Tablet</option>
+                            <option>Capsule</option>
+                            <option>Syrup</option>
+                            <option>Injection</option>
+                            <option>Cream</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Manufacturer:</label>
+                        <input type="text" id="manufacturer" value="ABC Pharma">
+                    </div>
+                    <div class="form-group">
+                        <label>Price Per Unit:</label>
+                        <input type="number" step="0.01" id="pricePerUnit" value="2.50">
+                    </div>
+                    <button class="btn btn-primary" onclick="createMedicine()">➕ Create Medicine</button>
+                </div>
+                <div>
+                    <h3>View All Medicines</h3>
+                    <button class="btn btn-secondary" onclick="getAllMedicines()">📋 Get All Medicines</button>
+                    <div id="medicinesList" class="data-list" style="display:none;"></div>
+                </div>
+            </div>
+            <div id="medicineResponse" class="response" style="display:none;"></div>
+        </div>
+
+        <!-- STEP 3: Batches -->
+        <div class="section">
+            <h2>Step 3️⃣: Batches (Stock with Expiry)</h2>
+            <div class="grid">
+                <div>
+                    <h3>Create New Batch</h3>
+                    <div class="form-group">
+                        <label>Batch Number:</label>
+                        <input type="text" id="batchNumber" placeholder="e.g., BATCH-2025-001" value="BATCH-2025-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Medicine ID (from Step 2):</label>
+                        <input type="number" id="medicineId" placeholder="Get this from medicine response">
+                    </div>
+                    <div class="form-group">
+                        <label>Slot ID (from Step 1):</label>
+                        <input type="number" id="slotId" placeholder="Get this from slot response">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="quantity" value="500">
+                    </div>
+                    <div class="form-group">
+                        <label>Manufacture Date:</label>
+                        <input type="date" id="manufactureDate" value="2025-01-15">
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date:</label>
+                        <input type="date" id="expiryDate" value="2027-01-15">
+                    </div>
+                    <button class="btn btn-primary" onclick="createBatch()">➕ Create Batch</button>
+                </div>
+                <div>
+                    <h3>View All Batches</h3>
+                    <button class="btn btn-secondary" onclick="getAllBatches()">📋 Get All Batches</button>
+                    <div id="batchesList" class="data-list" style="display:none;"></div>
+                </div>
+            </div>
+            <div id="batchResponse" class="response" style="display:none;"></div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section">
+            <h2>🚀 Quick Actions</h2>
+            <button class="btn btn-success" onclick="createCompleteWorkflow()">⚡ Auto-Create Complete Example</button>
+            <button class="btn btn-secondary" onclick="clearAllResponses()">🗑️ Clear All Responses</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+
+        // Check backend status
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/medicines`);
+                if (response.ok) {
+                    document.getElementById('statusBadge').className = 'status online';
+                    document.getElementById('statusBadge').textContent = '✅ Backend Online';
+                }
+            } catch (error) {
+                document.getElementById('statusBadge').className = 'status offline';
+                document.getElementById('statusBadge').textContent = '❌ Backend Offline - Start backend-springboot/start-backend.bat';
+            }
+        }
+
+        // Slot functions
+        async function createSlot() {
+            const data = {
+                slotNumber: document.getElementById('slotNumber').value,
+                location: document.getElementById('slotLocation').value,
+                capacity: parseInt(document.getElementById('slotCapacity').value),
+                currentLoad: 0,
+                isAvailable: true
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/slots`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showResponse('slotResponse', result);
+                if (result.success && result.data.slotId) {
+                    document.getElementById('slotId').value = result.data.slotId;
+                }
+            } catch (error) {
+                showResponse('slotResponse', { success: false, message: error.message }, true);
+            }
+        }
+
+        async function getAllSlots() {
+            try {
+                const response = await fetch(`${API_BASE}/slots`);
+                const result = await response.json();
+                showList('slotsList', result.data, 'slotId', ['slotNumber', 'location', 'capacity', 'isAvailable']);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Medicine functions
+        async function createMedicine() {
+            const data = {
+                medicineName: document.getElementById('medicineName').value,
+                type: document.getElementById('medicineType').value,
+                manufacturer: document.getElementById('manufacturer').value,
+                description: "Sample medicine description",
+                pricePerUnit: parseFloat(document.getElementById('pricePerUnit').value),
+                stockQuantity: 0,
+                reorderLevel: 100
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/medicines`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showResponse('medicineResponse', result);
+                if (result.success && result.data.medicineId) {
+                    document.getElementById('medicineId').value = result.data.medicineId;
+                }
+            } catch (error) {
+                showResponse('medicineResponse', { success: false, message: error.message }, true);
+            }
+        }
+
+        async function getAllMedicines() {
+            try {
+                const response = await fetch(`${API_BASE}/medicines`);
+                const result = await response.json();
+                showList('medicinesList', result.data, 'medicineId', ['medicineName', 'type', 'manufacturer', 'pricePerUnit']);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Batch functions
+        async function createBatch() {
+            const data = {
+                batchNumber: document.getElementById('batchNumber').value,
+                medicineId: parseInt(document.getElementById('medicineId').value),
+                slotId: parseInt(document.getElementById('slotId').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                manufactureDate: document.getElementById('manufactureDate').value,
+                expiryDate: document.getElementById('expiryDate').value,
+                receivedDate: new Date().toISOString().split('T')[0]
+            };
+
+            if (!data.medicineId || !data.slotId) {
+                alert('⚠️ Please create a Medicine and Slot first, then enter their IDs!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/batches`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showResponse('batchResponse', result);
+            } catch (error) {
+                showResponse('batchResponse', { success: false, message: error.message }, true);
+            }
+        }
+
+        async function getAllBatches() {
+            try {
+                const response = await fetch(`${API_BASE}/batches`);
+                const result = await response.json();
+                showList('batchesList', result.data, 'batchId', ['batchNumber', 'medicineName', 'slotNumber', 'quantity', 'expiryDate']);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Auto-create workflow
+        async function createCompleteWorkflow() {
+            if (!confirm('This will create: 1 slot + 1 medicine + 1 batch. Continue?')) return;
+
+            // Step 1: Create Slot
+            const slotResponse = await fetch(`${API_BASE}/slots`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    slotNumber: 'AUTO-SLOT-' + Date.now(),
+                    location: 'Auto-Generated Location',
+                    capacity: 1000,
+                    currentLoad: 0,
+                    isAvailable: true
+                })
+            });
+            const slot = await slotResponse.json();
+            console.log('Slot created:', slot);
+
+            // Step 2: Create Medicine
+            const medicineResponse = await fetch(`${API_BASE}/medicines`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    medicineName: 'Auto-Medicine ' + Date.now(),
+                    type: 'Tablet',
+                    manufacturer: 'Auto Pharma',
+                    description: 'Auto-generated for testing',
+                    pricePerUnit: 5.00,
+                    stockQuantity: 0,
+                    reorderLevel: 50
+                })
+            });
+            const medicine = await medicineResponse.json();
+            console.log('Medicine created:', medicine);
+
+            // Step 3: Create Batch
+            const batchResponse = await fetch(`${API_BASE}/batches`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    batchNumber: 'AUTO-BATCH-' + Date.now(),
+                    medicineId: medicine.data.medicineId,
+                    slotId: slot.data.slotId,
+                    quantity: 200,
+                    manufactureDate: '2025-01-01',
+                    expiryDate: '2027-01-01',
+                    receivedDate: new Date().toISOString().split('T')[0]
+                })
+            });
+            const batch = await batchResponse.json();
+
+            alert('✅ Complete workflow created!\n\n' +
+                  `Slot ID: ${slot.data.slotId}\n` +
+                  `Medicine ID: ${medicine.data.medicineId}\n` +
+                  `Batch ID: ${batch.data.batchId}`);
+            
+            // Refresh all lists
+            getAllSlots();
+            getAllMedicines();
+            getAllBatches();
+        }
+
+        // Helper functions
+        function showResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = isError ? 'response error' : 'response';
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+        function showList(elementId, data, idField, fields) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                element.innerHTML = '<div class="data-item">No data found</div>';
+                return;
+            }
+
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'data-item';
+                const details = fields.map(f => `${f}: ${item[f]}`).join(' | ');
+                div.innerHTML = `<strong>ID ${item[idField]}</strong>: ${details}`;
+                element.appendChild(div);
+            });
+        }
+
+        function clearAllResponses() {
+            ['slotResponse', 'medicineResponse', 'batchResponse'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            ['slotsList', 'medicinesList', 'batchesList'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+        }
+
+        // Check backend on load
+        checkBackend();
+        setInterval(checkBackend, 5000); // Check every 5 seconds
+    </script>
+</body>
+</html>
