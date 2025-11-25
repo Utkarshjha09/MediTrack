@@ -82,7 +82,7 @@ public class MedicineService {
         MedicineEntity persistedProduct = productRepository.save(newProduct);
         
         log.info("Successfully registered new product '{}' with ID: {}", 
-                 productName, persistedProduct.getId());
+                 productName, persistedProduct.getMedicineId());
         
         return dataTransformer.toDTO(persistedProduct);
     }

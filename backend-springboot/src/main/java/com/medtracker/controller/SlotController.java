@@ -98,7 +98,7 @@ public class SlotController {
         log.info("Registering new storage slot: {}", slotData.getSlotNumber());
         SlotDTO registeredSlot = warehouseService.createSlot(slotData);
         log.info("Successfully registered storage slot ID: {} ({})", 
-                 registeredSlot.getId(), registeredSlot.getSlotNumber());
+                 registeredSlot.getSlotId(), registeredSlot.getSlotNumber());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Storage slot registered", registeredSlot));
     }

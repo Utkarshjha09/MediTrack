@@ -5,7 +5,6 @@ import com.medtracker.dto.MedicineDTO;
 import com.medtracker.service.MedicineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,10 +29,6 @@ public class MedicineController {
     @GetMapping
     @Operation(summary = "Fetch complete medicine inventory",
                description = "Returns entire catalog of registered pharmaceutical products with full details")
-    @ApiResponses(value = {
-        @SwaggerResponse(responseCode = "200", description = "Catalog retrieved successfully",
-                        content = @Content(schema = @Schema(implementation = ApiResponse.class)))
-    })
     public ResponseEntity<ApiResponse<List<MedicineDTO>>> retrieveCompleteCatalog() {
         log.debug("Processing request for complete pharmaceutical catalog");
         List<MedicineDTO> productCatalog = pharmaceuticalService.getAllMedicines();
@@ -72,7 +67,7 @@ public class MedicineController {
             @Valid @RequestBody MedicineDTO productData) {
         log.info("Initiating registration for new product: {}", productData.getMedicineName());
         MedicineDTO registeredProduct = pharmaceuticalService.createMedicine(productData);
-        log.info("Successfully registered product with ID: {}", registeredProduct.getId());
+        log.info("Successfully registered product with ID: {}", registeredProduct.getMedicineId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("New pharmaceutical product registered", registeredProduct));
     }

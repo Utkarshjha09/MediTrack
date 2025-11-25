@@ -119,7 +119,7 @@ public class BatchController {
         log.info("Processing new batch registration: {}", batchData.getBatchNumber());
         BatchDTO registeredBatch = batchManagementService.createBatch(batchData);
         log.info("Successfully registered batch ID: {} ({})", 
-                 registeredBatch.getId(), registeredBatch.getBatchNumber());
+                 registeredBatch.getBatchId(), registeredBatch.getBatchNumber());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Batch registered in inventory", registeredBatch));
     }
