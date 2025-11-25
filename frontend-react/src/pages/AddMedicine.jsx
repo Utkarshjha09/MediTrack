@@ -20,8 +20,6 @@ const AddMedicine = () => {
           message: 'Medicine added successfully!',
           type: 'success',
         });
-        
-        // Redirect to medicines list after 2 seconds
         setTimeout(() => {
           navigate('/medicines');
         }, 2000);

@@ -51,7 +51,6 @@ const ViewMedicines = () => {
   };
 
   const handleEdit = (medicine) => {
-    // For now, just log - you can implement edit functionality
     console.log('Edit medicine:', medicine);
     setNotification({
       message: 'Edit functionality coming soon!',

@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const OTP_TTL_MS = Number(process.env.OTP_TTL_MS || 5 * 60 * 1000); // default 5 minutes
+const OTP_TTL_MS = Number(process.env.OTP_TTL_MS || 5 * 60 * 1000);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
 
 app.use(cors({ origin: CLIENT_ORIGIN }));
@@ -35,10 +35,8 @@ const maskEmail = (email) => {
 const validateTransporter = async () => {
   try {
     await transporter.verify();
-    // eslint-disable-next-line no-console
     console.log('SMTP connection verified.');
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Unable to verify SMTP configuration:', error.message);
   }
 };
@@ -67,7 +65,6 @@ app.post('/send-code', async (req, res) => {
 
     return res.json({ message: `Verification code sent to ${maskEmail(email)}.` });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Failed to send verification email:', error);
     return res.status(500).json({ message: 'Unable to send verification code right now.' });
   }
@@ -109,6 +106,5 @@ setInterval(() => {
 }, 60 * 1000);
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`OTP service running on port ${PORT}`);
 });

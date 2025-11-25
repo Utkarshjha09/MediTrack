@@ -18,7 +18,6 @@ let app = null;
 let auth = null;
 
 if (missingKeys.length > 0) {
-  // eslint-disable-next-line no-console
   console.warn(
     'Firebase config is missing the following environment variables:',
     missingKeys.join(', '),

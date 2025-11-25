@@ -20,8 +20,6 @@ const AddBatch = () => {
           message: 'Batch added successfully!',
           type: 'success',
         });
-        
-        // Redirect to dashboard after 2 seconds
         setTimeout(() => {
           navigate('/');
         }, 2000);

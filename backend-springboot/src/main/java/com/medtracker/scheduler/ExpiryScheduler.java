@@ -17,7 +17,6 @@ public class ExpiryScheduler {
 
     private final BatchService batchService;
 
-    // Run every day at 9:00 AM
     @Scheduled(cron = "0 0 9 * * ?")
     public void checkExpiringBatches() {
         log.info("Starting daily expiry check...");
@@ -25,7 +24,6 @@ public class ExpiryScheduler {
         LocalDate today = LocalDate.now();
         LocalDate thirtyDaysFromNow = today.plusDays(30);
         
-        // Get batches expiring within 30 days
         List<BatchDTO> expiringBatches = batchService.getBatchesExpiringBetween(today, thirtyDaysFromNow);
         
         if (!expiringBatches.isEmpty()) {
@@ -44,7 +42,6 @@ public class ExpiryScheduler {
         }
     }
 
-    // Run every Monday at 10:00 AM
     @Scheduled(cron = "0 0 10 * * MON")
     public void weeklyExpiryReport() {
         log.info("Generating weekly expiry report...");

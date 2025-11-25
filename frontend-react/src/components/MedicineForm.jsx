@@ -24,7 +24,6 @@ const MedicineForm = ({ onSubmit, initialData = null, isEdit = false }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Convert numeric fields
     const submitData = {
       ...formData,
       pricePerUnit: parseFloat(formData.pricePerUnit),

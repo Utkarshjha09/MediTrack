@@ -126,8 +126,6 @@ const TwoStep = () => {
             src="https://i.postimg.cc/SKSNJ5SQ/White-Letter-S-Logo-Instagram-Post.png"
             alt="Secure logo"
             onError={(event) => {
-              // fallback image hosted on placehold
-              // eslint-disable-next-line no-param-reassign
               event.currentTarget.src = 'https://placehold.co/128x128/161B22/FFFFFF?text=S';
             }}
           />

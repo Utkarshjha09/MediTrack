@@ -4,64 +4,102 @@ import com.medtracker.dto.ApiResponse;
 import com.medtracker.dto.MedicineDTO;
 import com.medtracker.service.MedicineService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/medicines")
 @RequiredArgsConstructor
-@Tag(name = "Medicine", description = "Medicine management APIs")
+@Tag(name = "Pharmaceutical Products", description = "APIs for managing medicine catalog and product information")
 public class MedicineController {
 
-    private final MedicineService medicineService;
+    private final MedicineService pharmaceuticalService;
 
     @GetMapping
-    @Operation(summary = "Get all medicines")
-    public ResponseEntity<ApiResponse<List<MedicineDTO>>> getAllMedicines() {
-        List<MedicineDTO> medicines = medicineService.getAllMedicines();
-        return ResponseEntity.ok(ApiResponse.success("Medicines retrieved successfully", medicines));
+    @Operation(summary = "Fetch complete medicine inventory",
+               description = "Returns entire catalog of registered pharmaceutical products with full details")
+    @ApiResponses(value = {
+        @SwaggerResponse(responseCode = "200", description = "Catalog retrieved successfully",
+                        content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    public ResponseEntity<ApiResponse<List<MedicineDTO>>> retrieveCompleteCatalog() {
+        log.debug("Processing request for complete pharmaceutical catalog");
+        List<MedicineDTO> productCatalog = pharmaceuticalService.getAllMedicines();
+        log.info("Successfully retrieved {} medicine records", productCatalog.size());
+        return ResponseEntity.ok(
+            ApiResponse.success("Pharmaceutical catalog loaded successfully", productCatalog)
+        );
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get medicine by ID")
-    public ResponseEntity<ApiResponse<MedicineDTO>> getMedicineById(@PathVariable Long id) {
-        MedicineDTO medicine = medicineService.getMedicineById(id);
-        return ResponseEntity.ok(ApiResponse.success("Medicine retrieved successfully", medicine));
+    @Operation(summary = "Locate medicine by unique ID",
+               description = "Retrieves detailed information for a specific pharmaceutical product")
+    public ResponseEntity<ApiResponse<MedicineDTO>> fetchProductByIdentifier(@PathVariable("id") Long productId) {
+        log.debug("Searching for medicine with ID: {}", productId);
+        MedicineDTO productDetails = pharmaceuticalService.getMedicineById(productId);
+        return ResponseEntity.ok(
+            ApiResponse.success("Product details located", productDetails)
+        );
     }
 
     @GetMapping("/name/{name}")
-    @Operation(summary = "Get medicine by name")
-    public ResponseEntity<ApiResponse<MedicineDTO>> getMedicineByName(@PathVariable String name) {
-        MedicineDTO medicine = medicineService.getMedicineByName(name);
-        return ResponseEntity.ok(ApiResponse.success("Medicine retrieved successfully", medicine));
+    @Operation(summary = "Search by product name",
+               description = "Finds medicine using its registered pharmaceutical name")
+    public ResponseEntity<ApiResponse<MedicineDTO>> locateByProductName(@PathVariable("name") String productName) {
+        log.debug("Executing name-based search for: {}", productName);
+        MedicineDTO matchedProduct = pharmaceuticalService.getMedicineByName(productName);
+        return ResponseEntity.ok(
+            ApiResponse.success("Product match found", matchedProduct)
+        );
     }
 
     @PostMapping
-    @Operation(summary = "Create new medicine")
-    public ResponseEntity<ApiResponse<MedicineDTO>> createMedicine(@RequestBody MedicineDTO medicineDTO) {
-        MedicineDTO createdMedicine = medicineService.createMedicine(medicineDTO);
+    @Operation(summary = "Register new pharmaceutical product",
+               description = "Adds new medicine to inventory catalog with complete specifications")
+    public ResponseEntity<ApiResponse<MedicineDTO>> registerNewProduct(
+            @Valid @RequestBody MedicineDTO productData) {
+        log.info("Initiating registration for new product: {}", productData.getMedicineName());
+        MedicineDTO registeredProduct = pharmaceuticalService.createMedicine(productData);
+        log.info("Successfully registered product with ID: {}", registeredProduct.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Medicine created successfully", createdMedicine));
+                .body(ApiResponse.success("New pharmaceutical product registered", registeredProduct));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update medicine")
-    public ResponseEntity<ApiResponse<MedicineDTO>> updateMedicine(
-            @PathVariable Long id,
-            @RequestBody MedicineDTO medicineDTO) {
-        MedicineDTO updatedMedicine = medicineService.updateMedicine(id, medicineDTO);
-        return ResponseEntity.ok(ApiResponse.success("Medicine updated successfully", updatedMedicine));
+    @Operation(summary = "Modify pharmaceutical product details",
+               description = "Updates existing medicine record with new specifications")
+    public ResponseEntity<ApiResponse<MedicineDTO>> modifyProductInformation(
+            @PathVariable("id") Long productId,
+            @Valid @RequestBody MedicineDTO updatedData) {
+        log.info("Processing update request for medicine ID: {}", productId);
+        MedicineDTO modifiedProduct = pharmaceuticalService.updateMedicine(productId, updatedData);
+        log.info("Successfully updated medicine: {}", modifiedProduct.getMedicineName());
+        return ResponseEntity.ok(
+            ApiResponse.success("Product information updated", modifiedProduct)
+        );
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete medicine")
-    public ResponseEntity<ApiResponse<Void>> deleteMedicine(@PathVariable Long id) {
-        medicineService.deleteMedicine(id);
-        return ResponseEntity.ok(ApiResponse.success("Medicine deleted successfully", null));
+    @Operation(summary = "Remove pharmaceutical product",
+               description = "Deletes medicine record from inventory catalog")
+    public ResponseEntity<ApiResponse<Void>> removeProductFromCatalog(@PathVariable("id") Long productId) {
+        log.warn("Initiating deletion of medicine ID: {}", productId);
+        pharmaceuticalService.deleteMedicine(productId);
+        log.info("Successfully removed medicine from catalog");
+        return ResponseEntity.ok(
+            ApiResponse.success("Pharmaceutical product removed from system", null)
+        );
     }
 }

@@ -48,8 +48,6 @@ const BatchForm = ({ onSubmit, initialData = null, isEdit = false }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Convert fields to appropriate types
     const submitData = {
       ...formData,
       medicineId: parseInt(formData.medicineId, 10),

@@ -3,7 +3,6 @@ import axios from 'axios';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 const OTP_BASE_URL = process.env.REACT_APP_OTP_BASE_URL || 'http://localhost:4000';
 
-// Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -18,7 +17,6 @@ const otpApi = axios.create({
   },
 });
 
-// Medicine API calls
 export const medicineAPI = {
   getAll: () => api.get('/medicines'),
   getById: (id) => api.get(`/medicines/${id}`),
@@ -28,7 +26,6 @@ export const medicineAPI = {
   delete: (id) => api.delete(`/medicines/${id}`),
 };
 
-// Batch API calls
 export const batchAPI = {
   getAll: () => api.get('/batches'),
   getById: (id) => api.get(`/batches/${id}`),
@@ -42,7 +39,6 @@ export const batchAPI = {
   delete: (id) => api.delete(`/batches/${id}`),
 };
 
-// Slot API calls
 export const slotAPI = {
   getAll: () => api.get('/slots'),
   getById: (id) => api.get(`/slots/${id}`),

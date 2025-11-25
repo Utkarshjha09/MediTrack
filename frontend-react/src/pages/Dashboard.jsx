@@ -21,16 +21,12 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
-      // Calculate date 30 days from now
       const today = new Date();
       const thirtyDaysFromNow = new Date();
       thirtyDaysFromNow.setDate(today.getDate() + 30);
       
       const todayStr = today.toISOString().split('T')[0];
       const thirtyDaysStr = thirtyDaysFromNow.toISOString().split('T')[0];
-
-      // Fetch all data
       const [medicinesRes, batchesRes, slotsRes, expiringRes] = await Promise.all([
         medicineAPI.getAll(),
         batchAPI.getAll(),

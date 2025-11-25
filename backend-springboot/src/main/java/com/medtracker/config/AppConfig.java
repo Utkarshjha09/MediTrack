@@ -8,5 +8,5 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(basePackages = "com.medtracker.repository")
 @EnableTransactionManagement
 public class AppConfig {
-    // Additional application-wide configurations can be added here
+    
 }

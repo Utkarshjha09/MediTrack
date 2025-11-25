@@ -15,19 +15,19 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         
-        // Allow credentials
+        
         config.setAllowCredentials(true);
         
-        // Allow origins (frontend URL)
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "http://localhost:*"));
         
-        // Allow headers
+        config.setAllowedOriginPatterns(Arrays.asList("http:
+        
+        
         config.setAllowedHeaders(Arrays.asList("*"));
         
-        // Allow methods
+        
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         
-        // Max age
+        
         config.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

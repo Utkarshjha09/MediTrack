@@ -5,13 +5,10 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
-    // Personal Information
     fullName: 'John Doe',
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
     role: 'Pharmacist',
-    
-    // Shop Details
     shopName: 'HealthCare Pharmacy',
     shopAddress: '123 Main Street, Suite 100',
     city: 'New York',
@@ -21,8 +18,6 @@ const Profile = () => {
     shopEmail: 'info@healthcarepharmacy.com',
     licenseNumber: 'PH-2024-12345',
     taxId: '12-3456789',
-    
-    // Business Hours
     openingTime: '09:00',
     closingTime: '20:00',
     workingDays: 'Monday - Saturday',
@@ -39,18 +34,15 @@ const Profile = () => {
   const handleSave = (e) => {
     e.preventDefault();
     setIsSaving(true);
-    // TODO: API call to save profile data
     setTimeout(() => {
       setIsSaving(false);
       setIsEditing(false);
-      // Show success message
       alert('Profile updated successfully!');
     }, 1500);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    // TODO: Reset form to original values from API
   };
 
   return (

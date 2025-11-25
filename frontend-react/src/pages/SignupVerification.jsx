@@ -31,7 +31,6 @@ const SignupVerification = () => {
 
     inputRefs.current[0]?.focus();
     sendCode();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [emailFromSignup]);
 
   const sendCode = async () => {
@@ -108,7 +107,6 @@ const SignupVerification = () => {
       const response = await otpAPI.verifyCode(emailFromSignup, filledCode);
       if (response.data?.valid) {
         setVerifyMessage(response.data?.message || 'Code verified successfully.');
-        // Log in user and redirect to dashboard
         login('verified-user-token');
         setTimeout(() => {
           navigate('/', { replace: true });
@@ -140,7 +138,6 @@ const SignupVerification = () => {
             src="https://i.postimg.cc/SKSNJ5SQ/White-Letter-S-Logo-Instagram-Post.png"
             alt="Secure logo"
             onError={(event) => {
-              // eslint-disable-next-line no-param-reassign
               event.currentTarget.src = 'https://placehold.co/128x128/161B22/FFFFFF?text=S';
             }}
           />

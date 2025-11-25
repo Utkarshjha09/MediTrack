@@ -80,12 +80,12 @@ public class BatchService {
 
         BatchEntity batch = batchMapper.toEntity(batchDTO);
 
-        // Set medicine
+        
         MedicineEntity medicine = medicineRepository.findById(batchDTO.getMedicineId())
                 .orElseThrow(() -> new ResourceNotFoundException("Medicine not found with id: " + batchDTO.getMedicineId()));
         batch.setMedicine(medicine);
 
-        // Set slot if provided
+        
         if (batchDTO.getSlotId() != null) {
             SlotEntity slot = slotRepository.findById(batchDTO.getSlotId())
                     .orElseThrow(() -> new ResourceNotFoundException("Slot not found with id: " + batchDTO.getSlotId()));
@@ -108,14 +108,14 @@ public class BatchService {
         existingBatch.setCostPrice(batchDTO.getCostPrice());
         existingBatch.setSellingPrice(batchDTO.getSellingPrice());
 
-        // Update medicine if changed
+        
         if (batchDTO.getMedicineId() != null && !batchDTO.getMedicineId().equals(existingBatch.getMedicine().getMedicineId())) {
             MedicineEntity medicine = medicineRepository.findById(batchDTO.getMedicineId())
                     .orElseThrow(() -> new ResourceNotFoundException("Medicine not found with id: " + batchDTO.getMedicineId()));
             existingBatch.setMedicine(medicine);
         }
 
-        // Update slot if changed
+        
         if (batchDTO.getSlotId() != null) {
             SlotEntity slot = slotRepository.findById(batchDTO.getSlotId())
                     .orElseThrow(() -> new ResourceNotFoundException("Slot not found with id: " + batchDTO.getSlotId()));
