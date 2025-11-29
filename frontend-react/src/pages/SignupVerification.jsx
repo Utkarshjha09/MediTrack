@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { otpAPI } from '../api';
 import { useAuth } from '../context/AuthContext';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 const CODE_LENGTH = 5;
 
@@ -10,6 +12,8 @@ const SignupVerification = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const emailFromSignup = location.state?.email || '';
+  const fullNameFromSignup = location.state?.fullName || '';
+  const phoneFromSignup = location.state?.phone || '';
   const [code, setCode] = useState(Array(CODE_LENGTH).fill(''));
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [sendMessage, setSendMessage] = useState('');
@@ -107,6 +111,17 @@ const SignupVerification = () => {
       const response = await otpAPI.verifyCode(emailFromSignup, filledCode);
       if (response.data?.valid) {
         setVerifyMessage(response.data?.message || 'Code verified successfully.');
+        
+        const userId = emailFromSignup.replace(/[@.]/g, '_');
+        const userDocRef = doc(db, 'users', userId);
+        await setDoc(userDocRef, {
+          fullName: fullNameFromSignup,
+          email: emailFromSignup,
+          phone: phoneFromSignup,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+        
         login('verified-user-token');
         setTimeout(() => {
           navigate('/', { replace: true });

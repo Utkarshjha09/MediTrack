@@ -147,6 +147,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
 
@@ -163,7 +164,7 @@ const SignUp = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      navigate('/verify-signup', { state: { email } });
+      navigate('/verify-signup', { state: { email, fullName, phone } });
     }, 1400);
   };
 
@@ -214,11 +215,29 @@ const SignUp = () => {
                   </span>
                 )}
               </div>
+              
+              <label htmlFor="phone">Phone number</label>
+              <div className="signup-input-wrapper">
+                <input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                  placeholder="Enter your phone number"
+                  className="signup-input"
+                />
+                {phone && (
+                  <span className="signup-input-icon">
+                    <CheckIcon />
+                  </span>
+                )}
+              </div>
+              
               <button
                 type="button"
                 className="signup-button"
                 onClick={handleNext}
-                disabled={!fullName}
+                disabled={!fullName || !phone}
               >
                 Next step
                 <ArrowRightIcon />
@@ -289,6 +308,10 @@ const SignUp = () => {
                   <li>
                     <span>Name</span>
                     <strong>{fullName}</strong>
+                  </li>
+                  <li>
+                    <span>Phone</span>
+                    <strong>{phone}</strong>
                   </li>
                   <li>
                     <span>Email</span>

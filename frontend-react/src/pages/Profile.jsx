@@ -1,27 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 import Loader from '../components/Loader';
 
 const Profile = () => {
+  const { currentUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
+    fullName: '',
+    email: '',
+    phone: '',
     role: 'Pharmacist',
-    shopName: 'HealthCare Pharmacy',
-    shopAddress: '123 Main Street, Suite 100',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10001',
-    shopPhone: '+1 (555) 987-6543',
-    shopEmail: 'info@healthcarepharmacy.com',
-    licenseNumber: 'PH-2024-12345',
-    taxId: '12-3456789',
+    shopName: '',
+    shopAddress: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    shopPhone: '',
+    shopEmail: '',
+    licenseNumber: '',
+    taxId: '',
     openingTime: '09:00',
     closingTime: '20:00',
     workingDays: 'Monday - Saturday',
   });
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (currentUser) {
+        try {
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setFormData({
+              fullName: userData.fullName || currentUser.displayName || '',
+              email: currentUser.email || '',
+              phone: userData.phone || '',
+              role: userData.role || 'Pharmacist',
+              shopName: userData.shopName || '',
+              shopAddress: userData.shopAddress || '',
+              city: userData.city || '',
+              state: userData.state || '',
+              zipCode: userData.zipCode || '',
+              shopPhone: userData.shopPhone || '',
+              shopEmail: userData.shopEmail || '',
+              licenseNumber: userData.licenseNumber || '',
+              taxId: userData.taxId || '',
+              openingTime: userData.openingTime || '09:00',
+              closingTime: userData.closingTime || '20:00',
+              workingDays: userData.workingDays || 'Monday - Saturday',
+            });
+          } else {
+            setFormData((prev) => ({
+              ...prev,
+              fullName: currentUser.displayName || '',
+              email: currentUser.email || '',
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [currentUser]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,19 +81,42 @@ const Profile = () => {
     }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    setTimeout(() => {
+    
+    try {
+      if (currentUser) {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        await setDoc(userDocRef, {
+          ...formData,
+          updatedAt: new Date().toISOString(),
+        }, { merge: true });
+        
+        setIsEditing(false);
+        alert('Profile updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
       setIsSaving(false);
-      setIsEditing(false);
-      alert('Profile updated successfully!');
-    }, 1500);
+    }
   };
 
   const handleCancel = () => {
     setIsEditing(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="profile-page">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <Loader />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-page">
